@@ -12,6 +12,8 @@ from diffusers import (
     DPMSolverMultistepScheduler,
 )
 from cog import BasePredictor, Input, Path
+import urllib.request
+
 
 
 class Predictor(BasePredictor):
@@ -32,9 +34,7 @@ class Predictor(BasePredictor):
     @torch.inference_mode()
     def predict(
         self,
-        image: Path = Input(
-            description="An image which will be repainted according to prompt",
-        ),
+        image_url:str = Input(description="Input image url only supports images with .png and .jpg extensions"),
         prompt: str = Input(
             description="Prompt to guide the image generation",
         ),
@@ -79,6 +79,9 @@ class Predictor(BasePredictor):
         ),
     ) -> List[Path]:
         """Run a single prediction on the model"""
+
+        image, headers = urllib.request.urlretrieve(image_url, filename='input.jpg')
+        print(f'image : {image}')
 
         if seed is None:
             seed = int.from_bytes(os.urandom(2), "big")
